@@ -1,0 +1,99 @@
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<title>PIN eingeben</title>
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
+	<script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+	<script src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+	<link rel="stylesheet" href="css/jquery.css" />
+
+	<script>
+	$(function() {
+	$( "button" )
+	    .button()
+	    .click(function( event ) {
+		event.preventDefault();
+	    });
+	});
+	$(function() {
+	$( "#info-dialog" ).dialog({
+		width: "600px",
+		resizable: false,
+		modal: true,
+		});
+	});
+	function showPINdialog() {
+		$(function() {
+			$( "#dialog" ).dialog({
+					width: '200px',
+					resizable: false,
+			    modal: true,
+			    position: "center",
+			    buttons: {
+				"C": function() {
+					document.getElementById('PIN').value = "";
+					$( this ).animate({backgroundColor: 'white'}, 'slow');
+				},
+				"OK": function() {
+					$( this ).effect('shake').animate({backgroundColor: 'red'}, 'slow');
+					$("#warning").show();
+				},
+				"X": function() {
+				    $( this ).dialog( "close" );
+				}
+			    }
+			});
+		    });
+		}
+	showPINdialog();
+	</script>
+</head>
+
+<body>
+ <center>
+ 
+ <div id="info-dialog" title="Smartcard vorhanden">
+	 <table border=0 cellpadding="3px">
+		<tr>
+			<td>Leser:</td>
+			<td>%s</td>
+		</tr>
+		<tr>
+			<td>Karte:</td>
+			<td>%s</td>
+		</tr>
+		<tr>
+			<td>Status:</td>
+			<td><i>Karte gesperrt</i></td>
+		</tr>
+	</table>
+	<br/>
+	<br/>
+	<button onClick="showPINdialog();" >Fortfahren mit PIN-Eingabe ...</button>
+	 </div>
+ 
+<div id="dialog" title="PIN eingeben">
+	<center>
+	<input id=PIN />
+	<br/>
+	<br/>
+	<button>1</button>
+	<button>2</button>
+	<button>3</button>
+	<br/>
+	<button>4</button>
+	<button>5</button>
+	<button>6</button>
+	<br/>
+	<button>7</button>
+	<button>8</button>
+	<button>9</button>
+	<br/>
+	<button>0</button>
+	<br/>
+	<b>Nach 3 falschen Eingaben wird die Karte gesperrt</b>
+</div>
+</body>
+
+</html>
