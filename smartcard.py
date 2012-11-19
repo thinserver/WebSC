@@ -1,20 +1,31 @@
 #!/usr/bin/python
 
+#
+# smartcard functions
+#
+
+import bobo
 from opensc import *
 
-def smartcard_is_present():
+def is_present():
 	return True
 
-def smartcard_not_present():
+def not_present():
 	reader = getReaderName()
-	return open('smartcard_not_present.html').read() % (reader)
+	return open('smartcard/not_present.html').read() #% (reader)
 
-def smartcard_is_locked():
+def is_locked():
 	return False
 
 def enter_pin():
-	return open('smartcard_enter_pin.html').read() % (getReaderName(), getSmartcardName())
+	return open('smartcard/enter_pin.html').read() #% (getReaderName(), getSmartcardName())
 
-def smartcard_menu():
-	reader = getReaderName()
-	return open('smartcard_menu.html').read() # % (getReaderName(), getSmartcardName())
+@bobo.query('/smartcard')
+def main():
+	if is_present():
+		if is_locked():
+			return enter_pin()
+		else:
+			return open('smartcard/details.html').read()
+	else:
+		return not_present()

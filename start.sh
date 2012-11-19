@@ -1,4 +1,4 @@
 #!/bin/bash
 
-bobo -f index.py
+bobo -f index.py -f smartcard.py
 
