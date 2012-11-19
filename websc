@@ -1,0 +1,4 @@
+#!/bin/bash
+
+bobo -f index.py -f keyman.py -f smartcard.py
+

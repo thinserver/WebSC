@@ -1,0 +1,89 @@
+<html>
+
+<head>
+	<title>WebSC</title>
+	<!-- jQuery 1.8.2 -->
+	<link rel="stylesheet" href="css/jquery.css" />
+	<script src="js/jquery.js"></script>
+	<!-- jQuery 1.9.1 -->
+	<link rel="stylesheet" href="css/jquery-ui.css" />
+	<script src="js/jquery-ui.js"></script>
+	<script>
+		// tabs to the left!
+		$(function() {
+			$( "#tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
+			$( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+		});
+	</script>
+	<style>
+		.ui-tabs-vertical { width: 55em; height: 60em;}
+		.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 12em;    }
+		.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
+		.ui-tabs-vertical .ui-tabs-nav li a { display:block; }
+		.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; width:104%;}
+		.ui-tabs-vertical .ui-tabs-panel { border: 1px solid grey; padding: 1em; float: right; width: 40em; height: 57.5em;}
+
+		iframe		{
+				border:		none;
+				width:		100%;
+				height:		55em;
+				}
+	</style>
+</head>
+
+<body> 
+ <center>
+ <br/>
+ <br/>
+ <div>
+	 <button onclick="window.location.href='..';"><img src="img/backarrow.png" /></button>
+	 <br/>
+
+	<div id="tabs">
+		<ul>
+			<li><a href="#tab-encrypt"	>Verschl&uuml;sseln</a></li>
+			<li><a href="#tab-decrypt"	>Entschl&uuml;sseln</a></li>
+			<li><a href="#tab-sign"		>Signieren</a></li>
+			<li><a href="#tab-verify"	>Signatur pr&uuml;fen</a></li>
+			<li><a href="#tab-keys"		>Schl&uuml;ssel</a></li>
+			<li><a href="#tab-smartcard"	>Smartcard</a></li>
+			<li><a href="#tab-browser"	>Browser-Zertifikate</a></li>
+		</ul>
+
+		<div id="tab-encrypt">
+			<h2>Dokument verschl&uuml;sseln</h2>
+			<iframe src="encrypt"></iframe>
+		</div>
+
+		<div id="tab-decrypt">
+			<h2>Dokument entschl&uuml;sseln</h2>
+			<iframe src="decrypt"></iframe>
+		</div>
+
+		<div id="tab-sign">
+			<h2>Dokument signieren</h2>
+			<iframe src="sign"></iframe>
+		</div>
+		
+		<div id="tab-verify">
+			<h2>Dokumentensignatur pr&uuml;fen</h2>
+			<iframe src="verify"></iframe>
+		</div>
+		
+		<div id="tab-keys">
+			<iframe src="keyman"></iframe>
+		</div>
+
+		<div id="tab-smartcard">
+			<iframe src="smartcard"></iframe>
+		</div>
+
+		<div id="tab-browser">
+			<h2>Browser-Zertifikate</h2>
+			<iframe src="browsercertificates"></iframe>
+		</div>
+	</div>
+</div>
+</body>
+
+</html>

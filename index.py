@@ -8,7 +8,7 @@ import bobo
 
 @bobo.query('/')
 def index():
-	return open('main.html').read()
+	return open('index.html').read()
 
 #bobo.query('/favicon.ico')
 #def favicon():

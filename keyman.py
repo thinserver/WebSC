@@ -1,6 +1,12 @@
 #!/usr/bin/python
 
-# after http://www.enigmail.net/documentation/keyman.php
+#
+# key manager
+# designed after the Enigmail OpenPGP Key Manager
+# http://www.enigmail.net/documentation/keyman.php
+#
+
+import bobo
 
 class myKeys:
 	def __init__(self, username="user", userkey="ABCDEF"):
@@ -46,7 +52,14 @@ class myKeys:
 	def sync(self, keyserver):
 		return []
 
-# demo
+# demo for myKeys class
 if __name__ == "__main__":
 	print str(myKeys().list())
 
+@bobo.query('/keyman')
+def keyring():
+	return open('keyman/manager.html').read()
+
+@bobo.query('/keyring')
+def keyring():
+	return open('keyman/keyring.html').read()
