@@ -7,34 +7,28 @@
 #
 
 import bobo
+import gpgme
 
-class Keyring:
-	def __init__(self, home="/home/user"):
-		self.home = home
-
-	def list(self):
-		return ['a', 'b', 'c']
-
-	# download foreign signatures to keys, which I have in my keyring
-	# download other people's key revocations
-	# download other people's signature revocations
-	# upload my signatures to foreign keys
-	# upload my key revocations
-	# upload my signature revocations
-	def sync(self, keyserver):
-		return []
-
-# demo for myKeys class
-if __name__ == "__main__":
-	print str(myKeys().list())
+pubkey_algo = {
+			1: 'RSA',
+			17: 'DSA'
+			}
 
 @bobo.query('/keyring')
 def keyring():
-	k = myKeys()
+	gpg = gpgme.Context()
 	keys = ''
 	key_template = open('keyman/key.html').read()
-	for key in k.list():
-		keys += key_template % (key, 'test')
+	keylist = gpg.keylist()
+	br = '<br/>\n'
+	for key in keylist:
+		subkey = key.subkeys[0]
+		keys += key_template % (key, 	pubkey_algo[subkey.pubkey_algo] + br +
+									str(subkey.length)+' bit' + br +
+									subkey.keyid + br +
+									subkey.fpr + br +
+									str(subkey.expired)
+							)
 	return open('keyman/keyring.html').read() % (keys)
 
 @bobo.query('/keyman')

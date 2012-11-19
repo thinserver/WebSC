@@ -1,0 +1,137 @@
+From http://pyme.sourceforge.net/doc/gpgme/Key-Management.html#Key-Management
+
+The gpgme_key_t type is a pointer to a key object. It has the following members:
+
+	gpgme_keylist_mode_t keylist_mode
+		The keylist mode that was active when the key was retrieved. 
+	unsigned int revoked : 1
+		This is true if the key is revoked. 
+	unsigned int expired : 1
+		This is true if the key is expired. 
+	unsigned int disabled : 1
+		This is true if the key is disabled. 
+	unsigned int invalid : 1
+		This is true if the key is invalid. This might have several reasons, for a example for the S/MIME backend, it will be set in during key listsing if the key could not be validated due to a missing certificates or unmatched policies. 
+	unsigned int can_encrypt : 1
+		This is true if the key (ie one of its subkeys) can be used for encryption. 
+	unsigned int can_sign : 1
+		This is true if the key (ie one of its subkeys) can be used to create data signatures. 
+	unsigned int can_certify : 1
+		This is true if the key (ie one of its subkeys) can be used to create key certificates. 
+	unsigned int can_authenticate : 1
+		This is true if the key (ie one of its subkeys) can be used for authentication. 
+	unsigned int is_qualified : 1
+		This is true if the key can be used for qualified signatures according to local government regulations. 
+	unsigned int secret : 1
+		This is true if the key is a secret key. Note, that this will always be true even if the corresponding subkey flag may be false (offline/stub keys). 
+	gpgme_protocol_t protocol
+		This is the protocol supported by this key. 
+	char *issuer_serial
+		If protocol is GPGME_PROTOCOL_CMS, then this is the issuer serial. 
+	char *issuer_name
+		If protocol is GPGME_PROTOCOL_CMS, then this is the issuer name. 
+	char *chain_id
+		If protocol is GPGME_PROTOCOL_CMS, then this is the chain ID, which can be used to built the certificate chain. 
+	gpgme_validity_t owner_trust
+		If protocol is GPGME_PROTOCOL_OpenPGP, then this is the owner trust. 
+	gpgme_sub_key_t subkeys
+		This is a linked list with the subkeys of the key. The first subkey in the list is the primary key and usually available. 
+	gpgme_user_id_t uids
+		This is a linked list with the user IDs of the key. The first user ID in the list is the main (or primary) user ID.
+
+
+The subkey structure has the following members:
+
+	gpgme_sub_key_t next
+		This is a pointer to the next subkey structure in the linked list, or NULL if this is the last element. 
+	unsigned int revoked : 1
+		This is true if the subkey is revoked. 
+	unsigned int expired : 1
+		This is true if the subkey is expired. 
+	unsigned int disabled : 1
+		This is true if the subkey is disabled. 
+	unsigned int invalid : 1
+		This is true if the subkey is invalid. 
+	unsigned int can_encrypt : 1
+		This is true if the subkey can be used for encryption. 
+	unsigned int can_sign : 1
+		This is true if the subkey can be used to create data signatures. 
+	unsigned int can_certify : 1
+		This is true if the subkey can be used to create key certificates. 
+	unsigned int can_authenticate : 1
+		This is true if the subkey can be used for authentication. 
+	unsigned int is_qualified : 1
+		This is true if the subkey can be used for qualified signatures according to local government regulations. 
+	unsigned int secret : 1
+		This is true if the subkey is a secret key. Note that it will be false if the key is actually a stub key; i.e. a secret key operation is currently not possible (offline-key). 
+	gpgme_pubkey_algo_t pubkey_algo
+		This is the public key algorithm supported by this subkey. 
+	unsigned int length
+		This is the length of the subkey (in bits). 
+	char *keyid
+		This is the key ID of the subkey in hexadecimal digits. 
+	char *fpr
+		This is the fingerprint of the subkey in hexadecimal digits, if available. 
+	long int timestamp
+		This is the creation timestamp of the subkey. This is -1 if the timestamp is invalid, and 0 if it is not available. 
+	long int expires
+		This is the expiration timestamp of the subkey, or 0 if the subkey does not expire.
+
+
+The key signature structure has the following members:
+
+	gpgme_key_sig_t next
+		This is a pointer to the next key signature structure in the linked list, or NULL if this is the last element. 
+	unsigned int revoked : 1
+		This is true if the key signature is a revocation signature. 
+	unsigned int expired : 1
+		This is true if the key signature is expired. 
+	unsigned int invalid : 1
+		This is true if the key signature is invalid. 
+	unsigned int exportable : 1
+		This is true if the key signature is exportable. 
+	gpgme_pubkey_algo_t pubkey_algo
+		This is the public key algorithm used to create the signature. 
+	char *keyid
+		This is the key ID of the key (in hexadecimal digits) used to create the signature. 
+	long int timestamp
+		This is the creation timestamp of the key signature. This is -1 if the timestamp is invalid, and 0 if it is not available. 
+	long int expires
+		This is the expiration timestamp of the key signature, or 0 if the key signature does not expire. 
+	gpgme_error_t status
+		This is the status of the signature and has the same meaning as the member of the same name in a gpgme_signature_t object. 
+	unsigned int sig_class
+		This specifies the signature class of the key signature. The meaning is specific to the crypto engine. 
+	char *uid
+		This is the main user ID of the key used to create the signature. 
+	char *name
+		This is the name component of uid, if available. 
+	char *comment
+		This is the comment component of uid, if available. 
+	char *email
+		This is the email component of uid, if available. 
+	gpgme_sig_notation_t notations
+		This is a linked list with the notation data and policy URLs.
+
+
+The user ID structure has the following members.
+
+	gpgme_user_id_t next
+		This is a pointer to the next user ID structure in the linked list, or NULL if this is the last element. 
+	unsigned int revoked : 1
+		This is true if the user ID is revoked. 
+	unsigned int invalid : 1
+		This is true if the user ID is invalid. 
+	gpgme_validity_t validity
+		This specifies the validity of the user ID. 
+	char *uid
+		This is the user ID string. 
+	char *name
+		This is the name component of uid, if available. 
+	char *comment
+		This is the comment component of uid, if available. 
+	char *email
+		This is the email component of uid, if available. 
+	gpgme_key_sig_t signatures
+		This is a linked list with the signatures on this user ID.
+
