@@ -8,40 +8,12 @@
 
 import bobo
 
-class myKeys:
-	def __init__(self, username="user", userkey="ABCDEF"):
-		self.username = username
-		self.userkey = userkey
+class Keyring:
+	def __init__(self, home="/home/user"):
+		self.home = home
 
-	# returns array of local key IDs
 	def list(self):
-		return []
-
-	# allow web user to upload a key
-	def add(self, key):
-		# parse
-		return None
-
-	# set trust level of a specific key
-	def set_trust(self, id, trust):
-		return None
-
-	# sign specific key
-	def sign(self, id):
-		return None
-
-	# download a specific key by it's ID
-	# in ASCII format
-	# return None on error
-	def export(self, id):
-		asc = '...'
-		return asc
-
-	def get_photo(self, id):
-		return None
-
-	def get_signatures(self, id):
-		return []
+		return ['a', 'b', 'c']
 
 	# download foreign signatures to keys, which I have in my keyring
 	# download other people's key revocations
@@ -56,10 +28,15 @@ class myKeys:
 if __name__ == "__main__":
 	print str(myKeys().list())
 
-@bobo.query('/keyman')
-def keyman():
-	return open('keyman/manager.html').read()
-
 @bobo.query('/keyring')
 def keyring():
-	return open('keyman/keyring.html').read()
+	k = myKeys()
+	keys = ''
+	key_template = open('keyman/key.html').read()
+	for key in k.list():
+		keys += key_template % (key, 'test')
+	return open('keyman/keyring.html').read() % (keys)
+
+@bobo.query('/keyman')
+def keyman():
+	return keyring()
