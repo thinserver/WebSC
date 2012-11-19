@@ -10,13 +10,17 @@ import bobo
 def index():
 	return open('index.html').read()
 
-#bobo.query('/favicon.ico')
-#def favicon():
-#	return bobo.redirect('/img/favicon.ico')
+bobo.query('/favicon.ico')
+def favicon():
+	return bobo.redirect('/img/favicon.ico')
 
 @bobo.query('/img/:filename')
 def img(filename='wait.gif'):
 	return open('img/'+filename).read()
+
+@bobo.query('/js/:filename')
+def img(filename='jquery.js'):
+	return open('js/'+filename).read()
 
 @bobo.query('/css/:filename')
 def css(filename='jquery.css'):

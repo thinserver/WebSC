@@ -57,7 +57,7 @@ if __name__ == "__main__":
 	print str(myKeys().list())
 
 @bobo.query('/keyman')
-def keyring():
+def keyman():
 	return open('keyman/manager.html').read()
 
 @bobo.query('/keyring')

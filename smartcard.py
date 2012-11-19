@@ -21,7 +21,7 @@ def enter_pin():
 	return open('smartcard/enter_pin.html').read() #% (getReaderName(), getSmartcardName())
 
 @bobo.query('/smartcard')
-def main():
+def smartcard():
 	if is_present():
 		if is_locked():
 			return enter_pin()
