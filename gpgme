@@ -1,4 +1,5 @@
-From http://pyme.sourceforge.net/doc/gpgme/Key-Management.html#Key-Management
+See also
+http://pyme.sourceforge.net/doc/gpgme/Key-Management.html#Key-Management
 
 The gpgme_key_t type is a pointer to a key object. It has the following members:
 
