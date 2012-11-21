@@ -50,7 +50,7 @@ def keyring():
 
 		# get all signatures for this certificate
 		# for signature in key.signatures:
-		signatures += signature_template % ('Matthias Bock', 'mail@matthiasbock.net', '12345')
+		signatures += signature_template % ('Matthias Bock', 'mail@matthiasbock.net', '12345678')
 
 		# render
 		keys += key_template % (title, "C72A19AB", certificate, signatures)
