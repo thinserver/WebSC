@@ -5,7 +5,6 @@
 #
 
 import bobo
-# openssl ...
 
 @bobo.query('/logincerts')
 def keyring():

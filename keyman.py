@@ -54,6 +54,7 @@ def keyring():
 
 		# render
 		keys += key_template % (title, "C72A19AB", certificate, signatures)
+
 	return open('keyman/keyring.html').read() % (keys)
 
 @bobo.query('/keyman')
