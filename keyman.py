@@ -17,6 +17,11 @@ pubkey_algo = {
 @bobo.query('/keyring')
 def keyring():
 	# load templates
+	
+	new_data = encrypt(AJAX_data)
+	
+	return new_data
+	
 	key_template = open('keyman/key.html').read()
 	uid_template = open('keyman/uid.html').read()
 	subkey_template = open('keyman/subkey.html').read()
