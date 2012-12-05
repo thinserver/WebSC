@@ -6,6 +6,6 @@
 
 import bobo
 
-@bobo.query('/logincerts')
-def keyring():
+@bobo.query('/logincerts.py')
+def logincerts():
 	return open('logincerts/certpile.html').read() % ('Zertifikate')
