@@ -17,8 +17,8 @@ $(function() {
 	}   
 
 	if (window.FormData) {
-  		formdata = new FormData();
-  		document.getElementById("btn").style.display = "none";
+		formdata = new FormData();
+		document.getElementById("btn").style.display = "none";
 	}
 	
 	input.addEventListener("change", function (evt) {
