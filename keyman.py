@@ -13,7 +13,7 @@ pubkey_algo = {
 			17: 'DSA'
 			}
 
-@bobo.query('/keyring')
+@bobo.query('/keyring.py')
 def keyring():
 	try:
 		import gpgme
