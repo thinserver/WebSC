@@ -3,5 +3,6 @@
 import bobo
 
 @bobo.query('/encrypt.py')
-def encrypt(content_type='image/png'):
-	return open('img/key.png').read()
+def encrypt(file, content_type='image/png'):
+	
+	return file #open('img/key.png').read()
