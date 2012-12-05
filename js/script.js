@@ -42,7 +42,7 @@ $(function() {
 
 		if (formdata) {
 			$.ajax({
-				url: "upload.php",
+				url: "encrypt.py",
 				type: "POST",
 				data: formdata,
 				processData: false,
