@@ -26,8 +26,15 @@
 					height:		55em;
 					}
 
-		.dropzone {
-			background: #999 !important;
+		.dropUpload .dropArea {
+			background-color: #ccc;
+			height: 120px;
+			margin: 10px 0;
+			width: 200px;
+		}
+
+		.dropUpload .messages {
+			font-family: monospace;
 		}
 	</style>
 </head>
@@ -54,7 +61,20 @@
 
 		<div id="tab-encrypt" class="dropzone">
 			<h2>Dokument verschl&uuml;sseln</h2>
-			<input type="submit" id="upload_button">
+			
+
+			<form action="/encrypt.py" method="post">
+				<div class="dropUpload">
+					<input type="text" name="customVariable1" value="Just a custom variable that are attached to the file on at drop-time">
+					<div class="dropArea">
+						<span>Drop Files Here</span>
+					</div>
+					<div class="queue">
+						<div class="items"></div>
+					</div>
+					<pre class="messages"></pre>
+				</div>
+			</form>
 			
 
         </form>  

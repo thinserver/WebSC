@@ -1,501 +1,308 @@
-/*global jQuery:false, alert:false */
-
 /*
- * Default text - jQuery plugin for html5 dragging files from desktop to browser
- *
- * Author: Weixi Yen
- *
- * Email: [Firstname][Lastname]@gmail.com
- *
- * Copyright (c) 2010 Resopollution
- *
- * Licensed under the MIT license:
- *   http://www.opensource.org/licenses/mit-license.php
- *
- * Project home:
- *   http://www.github.com/weixiyen/jquery-filedrop
- *
- * Version:  0.1.0
- *
- * Features:
- *      Allows sending of extra parameters with file.
- *      Works with Firefox 3.6+
- *      Future-compliant with HTML5 spec (will work with Webkit browsers and IE9)
- * Usage:
- *  See README at project homepage
- *
- */
-;(function($) {
+  jQuery plugin for drag/drop uploads in HTML5
 
-  jQuery.event.props.push("dataTransfer");
+  Author:
+    Pomle
+  Email:
+    pontus.alexander@gmail.com
 
-  var default_opts = {
-      fallback_id: '',
-      url: '',
-      refresh: 1000,
-      paramname: 'userfile',
-      allowedfiletypes:[],
-      maxfiles: 25,           // Ignored if queuefiles is set > 0
-      maxfilesize: 1,         // MB file size limit
-      queuefiles: 0,          // Max files before queueing (for large volume uploads)
-      queuewait: 200,         // Queue wait time if full
-      data: {},
-      headers: {},
-      drop: empty,
-      dragStart: empty,
-      dragEnter: empty,
-      dragOver: empty,
-      dragLeave: empty,
-      docEnter: empty,
-      docOver: empty,
-      docLeave: empty,
-      beforeEach: empty,
-      afterAll: empty,
-      rename: empty,
-      error: function(err, file, i) {
-        alert(err);
-      },
-      uploadStarted: empty,
-      uploadFinished: empty,
-      progressUpdated: empty,
-      globalProgressUpdated: empty,
-      speedUpdated: empty
-      },
-      errors = ["BrowserNotSupported", "TooManyFiles", "FileTooLarge", "FileTypeNotAllowed", "NotFound", "NotReadable", "AbortError", "ReadError"],
-      doc_leave_timer, stop_loop = false,
-      files_count = 0,
-      files;
+  Licensed under:
+    Kopimi, no rights reserved
 
-  $.fn.filedrop = function(options) {
-    var opts = $.extend({}, default_opts, options),
-        global_progress = [];
+  Project home:
+    https://github.com/pomle/jquery-dropUpload
 
-    this.on('drop', drop).on('dragstart', opts.dragStart).on('dragenter', dragEnter).on('dragover', dragOver).on('dragleave', dragLeave);
-    $(document).on('drop', docDrop).on('dragenter', docEnter).on('dragover', docOver).on('dragleave', docLeave);
+  Version:
+    0.5.4
 
-    $('#' + opts.fallback_id).change(function(e) {
-      opts.drop(e);
-      files = e.target.files;
-      files_count = files.length;
-      upload();
-    });
+  Usage:
+    See Example.html
+*/
 
-    function drop(e) {
-      opts.drop.call(this, e);
-      files = e.dataTransfer.files;
-      if (files === null || files === undefined || files.length === 0) {
-        opts.error(errors[0]);
+(function( $ ){
+
+  $.event.props.push("dataTransfer");
+
+  var emptyCallback = function() {};
+
+  var defaultSettings = {
+    'fileDropCountMax': null,
+    'fileMeta': emptyCallback,
+    'fileParamName': 'dropUploadFile',
+    'fileSimTransfers': 1,
+    'fileSizeMax': null,
+
+    'onComplete': emptyCallback,
+    'onDropError': emptyCallback,
+    'onDropSuccess': emptyCallback,
+    'onDragEnter': emptyCallback,
+    'onDragOver': emptyCallback,
+    'onDragLeave': emptyCallback,
+
+    'onFileCompleted': emptyCallback,
+    'onFileFailed': function(File, message)
+    {
+      alert(message);
+    },
+    'onFileQueued': emptyCallback,
+    'onFileSucceeded': emptyCallback,
+    'onFileStarted': emptyCallback,
+
+    'onProgressUpdated': emptyCallback,
+
+    'onQueueCompleted': emptyCallback,
+
+    'url': ''
+    };
+
+  $.fn.dropUpload = function(method)
+  {
+    var
+      isLoopRunning = false,
+      loopSize = 0,
+      queue = [],
+      settings = {};
+
+    var eventDrop = function(e)
+    {
+      e.preventDefault();
+
+      try
+      {
+        if( !e.dataTransfer.files || e.dataTransfer.files.length == 0 )
+          throw('FILE_ARRAY_EMPTY');
+
+        var FileList = e.dataTransfer.files;
+
+        if( settings.fileDropCountMax && FileList.length > settings.fileDropCountMax )
+          throw('FILE_DROP_COUNT_MAX');
+
+        settings.onDropSuccess();
+      }
+      catch(e)
+      {
+        settings.onDropError(e.message);
         return false;
       }
-      files_count = files.length;
-      upload();
+
+      filesHandler(FileList);
+
+      return true;
+    }
+
+    var eventDragEnter = function(e)
+    {
+      settings.onDragEnter();
+    }
+
+    var eventDragLeave = function(e)
+    {
+      settings.onDragLeave();
+    }
+
+    var eventDragOver = function(e)
+    {
+      e.preventDefault();
+      settings.onDragOver();
+    }
+
+    // A method to disable browser default behavior for certian events
+    var eventKillDefault = function(e)
+    {
       e.preventDefault();
       return false;
     }
 
-    function getBuilder(filename, filedata, mime, boundary) {
-      var dashdash = '--',
-          crlf = '\r\n',
-          builder = '';
+    var filesHandler = function(FileList)
+    {
+      // Iterate over all files and add to queue if isFileAccepted() returns true
+      filesIterator(FileList, function(File) {
+        if(isFileAccepted(File))
+          queueFile(File);
+      });
 
-      if (opts.data) {
-        var params = $.param(opts.data).split(/&/);
+      /*
+        Engage upload loop if not already running
+        Notice that it is allowed to start several instances, but it's recommended to control the simultaneous queue length with fileSimTransfers setting
+      */
+      if( !isLoopRunning )
+        uploadLoopEngage();
+    }
 
-        $.each(params, function() {
-          var pair = this.split("=", 2),
-              name = decodeURIComponent(pair[0]),
-              val  = decodeURIComponent(pair[1]);
+    // Lets us iterate over file lists in a consistent manner
+    var filesIterator = function(FileList, callback)
+    {
+      for(var index = 0; index < FileList.length; index++)
+        callback(FileList[index]);
 
-          builder += dashdash;
-          builder += boundary;
-          builder += crlf;
-          builder += 'Content-Disposition: form-data; name="' + name + '"';
-          builder += crlf;
-          builder += crlf;
-          builder += val;
-          builder += crlf;
+      return true;
+    }
+
+    // Returns wheater file is an acceptable upload or not
+    var isFileAccepted = function(File)
+    {
+      if( settings.fileSizeMax && (File.size > settings.fileSizeMax) )
+        return false;
+
+      return true;
+    }
+
+    var queueFile = function(File)
+    {
+      File.meta = settings.fileMeta() || {}; // If user function returns any data, put it on the File object
+
+      queue.push(File);
+
+      settings.onFileQueued(File);
+    }
+
+    // This function not totally quirk free as of now
+    var uploadLoopEngage = function()
+    {
+      isLoopRunning = true;
+
+      while( queue.length > 0 && loopSize < settings.fileSimTransfers )
+      {
+        var File = queue.shift();
+
+        try
+        {
+          loopSize++;
+          // uploadLoopEngage is sent as a callback for when the upload completes
+          uploadFile(File, uploadLoopEngage);
+        }
+        catch(e)
+        {
+          loopSize--;
+          // Inform plugin about failure
+          settings.onFileFailed(File, e.message);
+          settings.onFileCompleted(File);
+        }
+      }
+
+      isLoopRunning = false;
+    }
+
+    var uploadFile = function(File, onCompleteCallback)
+    {
+      //loopSize++;
+
+      settings.onFileStarted(File);
+
+      var File = File;
+      var FR = new FileReader();
+
+      // Defines the call that is made when upload has completed
+      var uploadFinished = function()
+      {
+        loopSize--;
+
+        settings.onProgressUpdated(File, 1);
+        settings.onFileCompleted(File);
+
+        if( typeof onCompleteCallback == 'function' )
+          onCompleteCallback();
+
+        if( loopSize == 0 )
+          settings.onQueueCompleted();
+      }
+
+      FR.File = File;
+      FR.onload = function(e) // Prepares file and meta data for the POST-stream
+      {
+        var payload = new FormData();
+
+        // Adds Meta data (connected by user defined function fileMeta()
+        $.each(this.File.meta, function(name, value)
+        {
+          payload.append(name, value);
         });
+
+        payload.append(File.name, File);
+
+        var XHR = new XMLHttpRequest();
+        XHR.open("POST", settings.url, true); // Perform asynchronous transfer
+
+        XHR.onerror = function(e)
+        {
+          settings.onFileFailed(File);
+          uploadFinished();
+        };
+
+        XHR.onload = function(e) // Triggers on completed upload
+        {
+          settings.onFileSucceeded(File, this.responseText); // reponseText is the response body printed by the server
+          uploadFinished();
+        };
+
+        XHR.upload.onprogress = function(e)
+        {
+          if (e.lengthComputable)
+            settings.onProgressUpdated(File, e.loaded / e.total);
+        };
+
+        XHR.send(payload);
       }
 
-      builder += dashdash;
-      builder += boundary;
-      builder += crlf;
-      builder += 'Content-Disposition: form-data; name="' + opts.paramname + '"';
-      builder += '; filename="' + filename + '"';
-      builder += crlf;
+      // Initiates reading and puts us in FR.onload on complete
+      FR.readAsBinaryString(File);
+    };
 
-      builder += 'Content-Type: ' + mime;
-      builder += crlf;
-      builder += crlf;
+    var methods = {
+      init: function( userOptions ) {
 
-      builder += filedata;
-      builder += crlf;
+        settings = $.extend({}, defaultSettings, userOptions);
 
-      builder += dashdash;
-      builder += boundary;
-      builder += dashdash;
-      builder += crlf;
-      return builder;
-    }
+        // I think this is to prevent the browser from opening the file
+        $(window)
+          .off('.dropUpload')
+          .on('drop.dropUpload', eventKillDefault)
+          .on('dragenter.dropUpload', eventKillDefault)
+          .on('dragover.dropUpload', eventKillDefault)
+          .on('dragleave.dropUpload', eventKillDefault)
+          ;
 
-    function progress(e) {
-      if (e.lengthComputable) {
-        var percentage = Math.round((e.loaded * 100) / e.total);
-        if (this.currentProgress !== percentage) {
+        return this.each(function(){
 
-          this.currentProgress = percentage;
-          opts.progressUpdated(this.index, this.file, this.currentProgress);
+          var fileSelect = $('<input type="file" multiple accept="*">');
 
-          global_progress[this.global_progress_index] = this.currentProgress;
-          globalProgress();
-
-          var elapsed = new Date().getTime();
-          var diffTime = elapsed - this.currentStart;
-          if (diffTime >= opts.refresh) {
-            var diffData = e.loaded - this.startData;
-            var speed = diffData / diffTime; // KB per second
-            opts.speedUpdated(this.index, this.file, speed);
-            this.startData = e.loaded;
-            this.currentStart = elapsed;
-          }
-        }
-      }
-    }
-
-    function globalProgress() {
-      if (global_progress.length === 0) {
-        return;
-      }
-
-      var total = 0, index;
-      for (index in global_progress) {
-        if(global_progress.hasOwnProperty(index)) {
-          total = total + global_progress[index];
-        }
-      }
-
-      opts.globalProgressUpdated(Math.round(total / global_progress.length));
-    }
-
-    // Respond to an upload
-    function upload() {
-      stop_loop = false;
-
-      if (!files) {
-        opts.error(errors[0]);
-        return false;
-      }
-
-      if (opts.allowedfiletypes.push && opts.allowedfiletypes.length) {
-        for(var fileIndex = files.length;fileIndex--;) {
-          if(!files[fileIndex].type || $.inArray(files[fileIndex].type, opts.allowedfiletypes) < 0) {
-            opts.error(errors[3], files[fileIndex]);
-            return false;
-          }
-        }
-      }
-
-      var filesDone = 0,
-          filesRejected = 0;
-
-      if (files_count > opts.maxfiles && opts.queuefiles === 0) {
-        opts.error(errors[1]);
-        return false;
-      }
-
-      // Define queues to manage upload process
-      var workQueue = [];
-      var processingQueue = [];
-      var doneQueue = [];
-
-      // Add everything to the workQueue
-      for (var i = 0; i < files_count; i++) {
-        workQueue.push(i);
-      }
-
-      // Helper function to enable pause of processing to wait
-      // for in process queue to complete
-      var pause = function(timeout) {
-        setTimeout(process, timeout);
-        return;
-      };
-
-      // Process an upload, recursive
-      var process = function() {
-
-        var fileIndex;
-
-        if (stop_loop) {
-          return false;
-        }
-
-        // Check to see if are in queue mode
-        if (opts.queuefiles > 0 && processingQueue.length >= opts.queuefiles) {
-          return pause(opts.queuewait);
-        } else {
-          // Take first thing off work queue
-          fileIndex = workQueue[0];
-          workQueue.splice(0, 1);
-
-          // Add to processing queue
-          processingQueue.push(fileIndex);
-        }
-
-        try {
-          if (beforeEach(files[fileIndex]) !== false) {
-            if (fileIndex === files_count) {
-              return;
-            }
-            var reader = new FileReader(),
-                max_file_size = 1048576 * opts.maxfilesize;
-
-            reader.index = fileIndex;
-            if (files[fileIndex].size > max_file_size) {
-              opts.error(errors[2], files[fileIndex], fileIndex);
-              // Remove from queue
-              processingQueue.forEach(function(value, key) {
-                if (value === fileIndex) {
-                  processingQueue.splice(key, 1);
-                }
-              });
-              filesRejected++;
-              return true;
-            }
-
-            reader.onerror = function(e) {
-                switch(e.target.error.code) {
-                    case e.target.error.NOT_FOUND_ERR:
-                        opts.error(errors[4]);
-                        return false;
-                    case e.target.error.NOT_READABLE_ERR:
-                        opts.error(errors[5]);
-                        return false;
-                    case e.target.error.ABORT_ERR:
-                        opts.error(errors[6]);
-                        return false;
-                    default:
-                        opts.error(errors[7]);
-                        return false;
-                };
-            };
-
-            reader.onloadend = !opts.beforeSend ? send : function (e) {
-              opts.beforeSend(files[fileIndex], fileIndex, function () { send(e); });
-            };
-            
-            reader.readAsBinaryString(files[fileIndex]);
-
-          } else {
-            filesRejected++;
-          }
-        } catch (err) {
-          // Remove from queue
-          processingQueue.forEach(function(value, key) {
-            if (value === fileIndex) {
-              processingQueue.splice(key, 1);
-            }
+          fileSelect.on("change", function(e) {
+            filesHandler(this.files);
           });
-          opts.error(errors[0]);
-          return false;
-        }
 
-        // If we still have work to do,
-        if (workQueue.length > 0) {
-          process();
-        }
-      };
+          $(this)
+            .on('click.dropUpload', function(e) { fileSelect.click(); })
 
-      var send = function(e) {
+            .on('drop.dropUpload', eventDrop)
+            .on('dragover.dropUpload', eventDragOver)
 
-        var fileIndex = ((typeof(e.srcElement) === "undefined") ? e.target : e.srcElement).index;
-
-        // Sometimes the index is not attached to the
-        // event object. Find it by size. Hack for sure.
-        if (e.target.index === undefined) {
-          e.target.index = getIndexBySize(e.total);
-        }
-
-        var xhr = new XMLHttpRequest(),
-            upload = xhr.upload,
-            file = files[e.target.index],
-            index = e.target.index,
-            start_time = new Date().getTime(),
-            boundary = '------multipartformboundary' + (new Date()).getTime(),
-            global_progress_index = global_progress.length,
-            builder,
-            newName = rename(file.name),
-            mime = file.type;
-
-        if (opts.withCredentials) {
-          xhr.withCredentials = opts.withCredentials;
-        }
-
-        if (typeof newName === "string") {
-          builder = getBuilder(newName, e.target.result, mime, boundary);
-        } else {
-          builder = getBuilder(file.name, e.target.result, mime, boundary);
-        }
-
-        upload.index = index;
-        upload.file = file;
-        upload.downloadStartTime = start_time;
-        upload.currentStart = start_time;
-        upload.currentProgress = 0;
-        upload.global_progress_index = global_progress_index;
-        upload.startData = 0;
-        upload.addEventListener("progress", progress, false);
-
-        xhr.open("POST", opts.url, true);
-        xhr.setRequestHeader('content-type', 'multipart/form-data; boundary=' + boundary);
-
-        // Add headers
-        $.each(opts.headers, function(k, v) {
-          xhr.setRequestHeader(k, v);
+            // dragenter and dragleave are inherently buggy and will cause problems with text
+            .on('dragenter.dropUpload', eventDragEnter)
+            .on('dragleave.dropUpload', eventDragLeave)
+            ;
         });
+      },
+      destroy: function()
+      {
+        $(window).off('.dropUpload');
 
-        xhr.sendAsBinary(builder);
+        return this.each(function(){
+          $(this).off('.dropUpload');
 
-        global_progress[global_progress_index] = 0;
-        globalProgress();
-
-        opts.uploadStarted(index, file, files_count);
-
-        xhr.onload = function() {
-            var serverResponse = null;
-
-            if (xhr.responseText) {
-              try {
-                serverResponse = jQuery.parseJSON(xhr.responseText);
-              }
-              catch (e) {
-                serverResponse = xhr.responseText;
-              }
-            }
-
-            var now = new Date().getTime(),
-                timeDiff = now - start_time,
-                result = opts.uploadFinished(index, file, serverResponse, timeDiff, xhr);
-            filesDone++;
-
-            // Remove from processing queue
-            processingQueue.forEach(function(value, key) {
-              if (value === fileIndex) {
-                processingQueue.splice(key, 1);
-              }
-            });
-
-            // Add to donequeue
-            doneQueue.push(fileIndex);
-
-            // Make sure the global progress is updated
-            global_progress[global_progress_index] = 100;
-            globalProgress();
-
-            if (filesDone === (files_count - filesRejected)) {
-              afterAll();
-            }
-            if (result === false) {
-              stop_loop = true;
-            }
-          
-
-          // Pass any errors to the error option
-          if (xhr.status < 200 && xhr.status > 299) {
-            opts.error(xhr.statusText);
-          }
-        };
-      };
-
-      // Initiate the processing loop
-      process();
-    }
-
-    function getIndexBySize(size) {
-      for (var i = 0; i < files_count; i++) {
-        if (files[i].size === size) {
-          return i;
-        }
+        });
       }
+    };
 
-      return undefined;
+    // Method calling logic
+    if ( methods[method] ) {
+      return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+    } else if ( typeof method === 'object' || ! method ) {
+      return methods.init.apply( this, arguments );
+    } else {
+      $.error( 'Method ' +  method + ' does not exist on jQuery.dropUpload' );
     }
-
-    function rename(name) {
-      return opts.rename(name);
-    }
-
-    function beforeEach(file) {
-      return opts.beforeEach(file);
-    }
-
-    function afterAll() {
-      return opts.afterAll();
-    }
-
-    function dragEnter(e) {
-      clearTimeout(doc_leave_timer);
-      e.preventDefault();
-      opts.dragEnter.call(this, e);
-    }
-
-    function dragOver(e) {
-      clearTimeout(doc_leave_timer);
-      e.preventDefault();
-      opts.docOver.call(this, e);
-      opts.dragOver.call(this, e);
-    }
-
-    function dragLeave(e) {
-      clearTimeout(doc_leave_timer);
-      opts.dragLeave.call(this, e);
-      e.stopPropagation();
-    }
-
-    function docDrop(e) {
-      e.preventDefault();
-      opts.docLeave.call(this, e);
-      return false;
-    }
-
-    function docEnter(e) {
-      clearTimeout(doc_leave_timer);
-      e.preventDefault();
-      opts.docEnter.call(this, e);
-      return false;
-    }
-
-    function docOver(e) {
-      clearTimeout(doc_leave_timer);
-      e.preventDefault();
-      opts.docOver.call(this, e);
-      return false;
-    }
-
-    function docLeave(e) {
-      doc_leave_timer = setTimeout((function(_this) {
-        return function() {
-          opts.docLeave.call(_this, e);
-        };
-      })(this), 200);
-    }
-
-    return this;
   };
 
-  function empty() {}
+  return this;
 
-  try {
-    if (XMLHttpRequest.prototype.sendAsBinary) {
-        return;
-    }
-    XMLHttpRequest.prototype.sendAsBinary = function(datastr) {
-      function byteValue(x) {
-        return x.charCodeAt(0) & 0xff;
-      }
-      var ords = Array.prototype.map.call(datastr, byteValue);
-      var ui8a = new Uint8Array(ords);
-      this.send(ui8a.buffer);
-    };
-  } catch (e) {}
-
-})(jQuery);
+})( jQuery );
