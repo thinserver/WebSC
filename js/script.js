@@ -3,6 +3,8 @@ $(function() {
 	$( "#tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
 	$( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
+
+	// Jquery Drag and Drop to Upload function
 	$('.dropzone').filedrop({
 		fallback_id: 'upload_button',   // an identifier of a standard file input element
 		url: 'upload.php',              // upload handler, handles each file separately
@@ -36,9 +38,9 @@ $(function() {
 					break;
 			}
 		},
-		allowedfiletypes: ['image/jpeg','image/png','image/gif'],   // filetypes allowed by Content-Type.  Empty array means no restrictions
+		allowedfiletypes: [],   // filetypes allowed by Content-Type.  Empty array means no restrictions
 		maxfiles: 25,
-		maxfilesize: 20,    // max file size in MBs
+		maxfilesize: 100,    // max file size in MBs
 		dragOver: function() {
 			// user dragging files over #dropzone
 			console.log('drag over');
@@ -55,27 +57,31 @@ $(function() {
 		},
 		drop: function() {
 			// user drops file
-			alert('drop');
 		},
 		uploadStarted: function(i, file, len){
 			// a file began uploading
 			// i = index => 0, 1, 2, 3, 4 etc
 			// file is the actual file of the index
 			// len = total files user dropped
+			console.log('hey');
 		},
 		uploadFinished: function(i, file, response, time) {
 			// response is the data you got back from server in JSON format.
+			console.log('yo');
 		},
 		progressUpdated: function(i, file, progress) {
 			// this function is used for large files and updates intermittently
 			// progress is the integer value of file being uploaded percentage to completion
+			console.log('bo');
 		},
 		globalProgressUpdated: function(progress) {
 			// progress for all the files uploaded on the current instance (percentage)
 			// ex: $('#progress div').width(progress+"%");
+			console.log('so');
 		},
 		speedUpdated: function(i, file, speed) {
 			// speed in kb/s
+			console.log('mo');
 		},
 		rename: function(name) {
 			// name in string format
@@ -89,9 +95,12 @@ $(function() {
 			// file is a file object
 			// i is the file index
 			// call done() to start the upload
+			console.log(file);
+			done();
 		},
 		afterAll: function() {
 			// runs after all files have been uploaded or otherwise dealt with
+			console.log('qo');
 		}
 	});
 
