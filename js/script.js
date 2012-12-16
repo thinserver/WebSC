@@ -49,6 +49,7 @@ $(function() {
 		},
 		'onFileSucceeded': function(File, response){
 			messages.text(response);
+			console.log(File);
 		},
 		'onQueueCompleted': function(){
 			alert("All done");
