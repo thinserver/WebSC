@@ -13,12 +13,30 @@
 	
 
 	<style>
+		body			{
+					background-color:	#F3F3F3;
+					}
+
+		#title		{
+					border:			1px solid #aaa;
+					border-radius:		5px;
+					background-color:	white;
+					width:			72em;
+					text-align:			center;
+					font-family:		'Times New Roman', Times, serif;
+					text-shadow:		2px 2px 5px darkgray;
+					padding:			none;
+					padding-top:		5px;
+					padding-bottom:	5px;
+					}
+
 		.ui-tabs-vertical { width: 65em; height: 60em;}
 		.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 12em;    }
 		.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
 		.ui-tabs-vertical .ui-tabs-nav li a { display:block; }
 		.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; width:104%;}
 		.ui-tabs-vertical .ui-tabs-panel { border: 1px solid grey; padding: 1em; float: right; width: 50em; height: 57.5em;}
+		.ui-widget-content { color: #aaa; }
 
 		iframe		{
 					border:		none;
@@ -29,13 +47,27 @@
 </head>
 
 <body> 
+<style>
+	#backdiv	{
+			border:		none;
+			background:	transparent;
+			position:		absolute;
+			left:			10px;
+			top:			10px;
+			box-shadow:	3px 3px 5px darkgray;
+			}
+</style>
+<div id=backdiv>
+	<button style="cursor: pointer;" onclick="window.location.href='/';"><img src="img/backarrow.png" alt="Zur&uuml;ck"/></button>
+</div>
  <center>
  <br/>
  <br/>
  <div>
-	 <button onclick="window.location.href='..';"><img src="img/backarrow.png" /></button>
-	 <font size="6pt">WebSC</font>
-	 <br/>
+	<div id="title">
+		<img src="img/keycard.png" style="vertical-align: bottom;"/>
+		<font size="6pt">WebSC</font>
+	</div>
 
 	<div id="tabs">
 		<ul>
