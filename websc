@@ -1,4 +1,3 @@
 #!/bin/bash
 
-
 bobo -f index.py -f keyman.py -f smartcard.py -f logincerts.py -f encrypt.py -f decrypt.py -f sign.py -f verify.py 

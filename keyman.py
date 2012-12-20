@@ -13,7 +13,7 @@ pubkey_algo = {
 			17: 'DSA'
 			}
 
-@bobo.query('/keyring.py')
+@bobo.query('/keyman.py')
 def keyring():
 	try:
 		import gpgme
@@ -58,6 +58,11 @@ def keyring():
 
 		# render
 		keys += key_template % (title, "C72A19AB", certificate, signatures)
+
+#	from subprocess import Popen, PIPE
+#	from shlex import split
+#	keys = Popen(['whoami'], stdout=PIPE).communicate()[0]
+#	"root"
 
 	return open('keyman/keyring.html').read() % (keys)
 

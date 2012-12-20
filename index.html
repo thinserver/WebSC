@@ -26,8 +26,8 @@
 					font-family:		'Times New Roman', Times, serif;
 					text-shadow:		2px 2px 5px darkgray;
 					padding:			none;
-					padding-top:		5px;
-					padding-bottom:	5px;
+					padding-top:		15px;
+					padding-bottom:	15px;
 					}
 
 		.ui-tabs-vertical { width: 65em; height: 60em;}
@@ -80,6 +80,22 @@
 			<li><a href="#tab-verify"	>Signatur pr&uuml;fen</a></li>
 		</ul>
 
+		<!-- Email-Zertifikate -->
+		<div id="tab-keys">
+			<iframe src="keyman.py"></iframe>
+		</div>
+
+		<!-- Login-Zertifikate -->
+		<div id="tab-login">
+			<iframe src="logincerts.py"></iframe>
+		</div>
+
+		<!-- Smartcard -->
+		<div id="tab-smartcard">
+			<iframe src="smartcard.py"></iframe>
+		</div>
+
+		<!-- Verschlüsseln -->
 		<div id="tab-encrypt">
 			<h2>Dokument verschl&uuml;sseln</h2>
 
@@ -94,32 +110,23 @@
         </form>  
 		</div>
 
+		<!-- Entschlüsseln -->
 		<div id="tab-decrypt">
 			<h2>Dokument entschl&uuml;sseln</h2>
-			<iframe src="decrypt"></iframe>
+			<iframe src="decrypt.py"></iframe>
 		</div>
 
+		<!-- Signieren -->
 		<div id="tab-sign">
 			<h2>Dokument signieren</h2>
-			<iframe src="sign"></iframe>
+			<iframe src="sign.py"></iframe>
 		</div>
 		
+		<!-- Signatur prüfen -->
 		<div id="tab-verify">
 			<h2>Dokumentensignatur pr&uuml;fen</h2>
-			<iframe src="verify"></iframe>
-		</div>
-		
-		<div id="tab-keys">
-			<iframe src="keyring.py"></iframe>
-		</div>
-
-		<div id="tab-smartcard">
-			<iframe src="smartcard"></iframe>
-		</div>
-
-		<div id="tab-login">
-			<iframe src="logincerts"></iframe>
-		</div>
+			<iframe src="verify.py"></iframe>
+		</div>		
 	</div>
 </div>
 </body>
