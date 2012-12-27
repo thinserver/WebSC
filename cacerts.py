@@ -5,7 +5,12 @@
 #
 
 import bobo
+import os
 
 @bobo.query('/cacerts.py')
 def cacerts():
-	return "Not yet implemented"
+	list = "<ul>\n"
+	for cert in sorted(os.listdir("cacerts")):
+		list += "\t<li>"+cert+"</li>\n"
+	list += "</ul>\n"
+	return list
