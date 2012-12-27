@@ -4,7 +4,18 @@ import bobo
 
 @bobo.query('/filemanager.py')
 def filemanager():
-	return open('filemanager/filemanager.html').read()
+	import os, time
+	template = open('filemanager/file.html').read()
+	rows = ""
+	filenames = sorted(os.listdir("files/"))
+	for filename in filenames:
+		size = os.path.getsize("files/"+filename)
+		date = time.ctime(os.path.getmtime("files/"+filename))
+		encryption = "-"
+		signature = "-"
+		rows += template % (filename, size, date, encryption, signature) 
+	count = str(len(filenames))
+	return open('filemanager/filemanager.html').read() % (rows, count)
 
 @bobo.post('/encrypt.py')
 def encrypt(bobo_request, images='Error: No file received on the server'):
