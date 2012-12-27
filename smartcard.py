@@ -5,10 +5,11 @@
 #
 
 def getReaderName():
-	return 'Fujitsu Siemens Computers SmartCard USB 2A 00 00'
+	return "Gemalto PC Twin Reader"
+	#'Fujitsu Siemens Computers SmartCard USB 2A'
 
 def getSmartcardName():
-	return 'Keine Smartcard' #'HU-CA Smartcard for Matthias Bock'
+	return "altinn - Buypass" #'Keine Smartcard' #'HU-CA Smartcard for Matthias Bock'
 
 
 import bobo
@@ -32,6 +33,6 @@ def smartcard():
 		if is_locked():
 			return enter_pin()
 		else:
-			return open('smartcard/details.html').read() % (getReaderName(), getSmartcardName(), 'Unbekannt')
+			return open('smartcard/details.html').read() % (getReaderName(), getSmartcardName(), 'Bereit')
 	else:
 		return not_present()

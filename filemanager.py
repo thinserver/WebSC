@@ -2,6 +2,10 @@
 
 import bobo
 
+@bobo.query('/filemanager.py')
+def filemanager():
+	return '0 Dateien'
+
 @bobo.post('/encrypt.py')
 def encrypt(bobo_request, images='Error: No file received on the server'):
 	print str(bobo_request)

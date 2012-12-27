@@ -71,19 +71,25 @@
 
 	<div id="tabs">
 		<ul>
-			<li><a href="#tab-files"		>Dateien</a></li>
-			<li><a href="#tab-keys"		>Email-Zertifikate</a></li>
-			<li><a href="#tab-login"		>Login-Zertifikate</a></li>
+			<li><a href="#tab-filemanager">Dateien</a></li>
 			<li><a href="#tab-smartcard"	>Smartcard</a></li>
+			<li><a href="#tab-keyring"	>Email-Zertifikate</a></li>
+			<li><a href="#tab-login"		>Login-Zertifikate</a></li>
+			<li><a href="#tab-ca"		>Zertifikat-Autorit&auml;ten</a></li>
 		</ul>
 
 		<!-- Datei-Manager -->
-		<div id="tab-files">
-			<iframe src="files.py"></iframe>
+		<div id="tab-filemanager">
+			<iframe src="filemanager.py"></iframe>
+		</div>
+
+		<!-- Smartcard -->
+		<div id="tab-smartcard">
+			<iframe src="smartcard.py"></iframe>
 		</div>
 
 		<!-- Email-Zertifikate -->
-		<div id="tab-keys">
+		<div id="tab-keyring">
 			<iframe src="keyring.py"></iframe>
 		</div>
 
@@ -92,25 +98,10 @@
 			<iframe src="logincerts.py"></iframe>
 		</div>
 
-		<!-- Smartcard -->
-		<div id="tab-smartcard">
-			<iframe src="smartcard.py"></iframe>
+		<!-- CA-Zertifikate -->
+		<div id="tab-ca">
+			<iframe src="cacerts.py"></iframe>
 		</div>
-
-		<!-- Verschlüsseln >
-		<div id="tab-encrypt">
-			<h2>Dokument verschl&uuml;sseln</h2>
-
-			<form method="post" enctype="multipart/form-data"  action="encrypt.py">  
-            	<input type="file" name="images" id="images" multiple />  
-            <button type="submit" id="btn">Upload</button>
-
-            <div id="response"></div>  
-        	<ul id="image-list"></ul>  
-
-        </form>  
-		</div-->
-
 	</div>
 </div>
 </body>
