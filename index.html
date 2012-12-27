@@ -71,18 +71,20 @@
 
 	<div id="tabs">
 		<ul>
+			<li><a href="#tab-files"		>Dateien</a></li>
 			<li><a href="#tab-keys"		>Email-Zertifikate</a></li>
 			<li><a href="#tab-login"		>Login-Zertifikate</a></li>
 			<li><a href="#tab-smartcard"	>Smartcard</a></li>
-			<li><a href="#tab-encrypt"	>Verschl&uuml;sseln</a></li>
-			<li><a href="#tab-decrypt"	>Entschl&uuml;sseln</a></li>
-			<li><a href="#tab-sign"		>Signieren</a></li>
-			<li><a href="#tab-verify"	>Signatur pr&uuml;fen</a></li>
 		</ul>
+
+		<!-- Datei-Manager -->
+		<div id="tab-files">
+			<iframe src="files.py"></iframe>
+		</div>
 
 		<!-- Email-Zertifikate -->
 		<div id="tab-keys">
-			<iframe src="keyman.py"></iframe>
+			<iframe src="keyring.py"></iframe>
 		</div>
 
 		<!-- Login-Zertifikate -->
@@ -95,11 +97,10 @@
 			<iframe src="smartcard.py"></iframe>
 		</div>
 
-		<!-- Verschlüsseln -->
+		<!-- Verschlüsseln >
 		<div id="tab-encrypt">
 			<h2>Dokument verschl&uuml;sseln</h2>
 
-			<!-- File uploader -->
 			<form method="post" enctype="multipart/form-data"  action="encrypt.py">  
             	<input type="file" name="images" id="images" multiple />  
             <button type="submit" id="btn">Upload</button>
@@ -108,25 +109,8 @@
         	<ul id="image-list"></ul>  
 
         </form>  
-		</div>
+		</div-->
 
-		<!-- Entschlüsseln -->
-		<div id="tab-decrypt">
-			<h2>Dokument entschl&uuml;sseln</h2>
-			<iframe src="decrypt.py"></iframe>
-		</div>
-
-		<!-- Signieren -->
-		<div id="tab-sign">
-			<h2>Dokument signieren</h2>
-			<iframe src="sign.py"></iframe>
-		</div>
-		
-		<!-- Signatur prüfen -->
-		<div id="tab-verify">
-			<h2>Dokumentensignatur pr&uuml;fen</h2>
-			<iframe src="verify.py"></iframe>
-		</div>		
 	</div>
 </div>
 </body>

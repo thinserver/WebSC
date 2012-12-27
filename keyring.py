@@ -3,7 +3,7 @@
 #
 # key manager
 # designed after the Enigmail OpenPGP Key Manager
-# http://www.enigmail.net/documentation/keyman.php
+# http://www.enigmail.net/documentation/keyring.php
 #
 
 import bobo
@@ -13,7 +13,7 @@ pubkey_algo = {
 			17: 'DSA'
 			}
 
-@bobo.query('/keyman.py')
+@bobo.query('/keyring.py')
 def keyring():
 	try:
 		import gpgme
@@ -21,10 +21,10 @@ def keyring():
 		return 'Exception: Python-GPGME library'
 
 	# load templates
-	key_template = open('keyman/key.html').read()
-	uid_template = open('keyman/uid.html').read()
-	subkey_template = open('keyman/subkey.html').read()
-	signature_template = open('keyman/signature.html').read()
+	key_template = open('keyring/key.html').read()
+	uid_template = open('keyring/uid.html').read()
+	subkey_template = open('keyring/subkey.html').read()
+	signature_template = open('keyring/signature.html').read()
 
 	# connect to GPG
 	gpg = gpgme.Context()
@@ -64,8 +64,5 @@ def keyring():
 #	keys = Popen(['whoami'], stdout=PIPE).communicate()[0]
 #	"root"
 
-	return open('keyman/keyring.html').read() % (keys)
+	return open('keyring/keyring.html').read() % (keys)
 
-@bobo.query('/keyman')
-def keyman():
-	return keyring()
